@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Load Script Experiment</title>
+</head>
+<body>
+	<h1 style="margin-top:100px;color:gray;" id="head1">This is a script loader experimental page. Please enable Firebug or HTTPWatch to see the details...</h1>
+	<script>
+	/**
+	 * 
+	 * ScriptLoader is a simple JavaScript loader utility API which downloads scripts 
+	 * in parallel with other resources along with maintaining execution order. 
+	 * 
+	 * The parallelism is achieved using the script DOM element technique (i.e. 
+	 * creating dynamic scripts and inserting them in DOM) and for execution order
+	 * a code massaging build time step is needed. 
+	 * 
+	 * The extra step is to wrap the entire JS code (for which execution order should
+	 * be maintained) in a wrapper function and passing that function in the API, as
+	 * shown below
+	 * 
+	 * var wrappedFn = function () {
+	 * 	// All the application JS code
+	 * };
+	 *
+	 * @function loadScript
+	 * @param fileList {Array|String} Array of JSON objects or the URL string
+	 * 					JSON object format { url:  “http://one.js”, delayedExec:  false },
+	 * 									   { url:  “http://two.js”, delayedExec:  “wrappedFn” }, 
+	 * @param callback {function} the callback function to be executed after the scripts are
+	 * 							  loaded
+	 * 
+	 */
+	function loadScript(fileList, callBack) {
+	    // Type conversion of fileList parameter if not an Array 
+		fileList = fileList.constructor === Array ? fileList : [fileList];
+	    
+		var count = 0, 
+	    	i = 0, 
+	    	len = fileList.length, 
+	    	obj = (typeof fileList[i] === "object"), 
+	    	scriptObj, 
+	    	headObj = document.documentElement.firstChild,
+	    	
+	    	done = function (idx) {
+		    	if (obj) {
+		    		fileList[idx].done = true;
+		            for (var j = 0; j < len; j++) {
+		            	/* Check if the dependent files are downloaded and executed else just break the loop */
+		            	if (!fileList[j].done) {
+		            		break;
+		            	}
+		                // Call the delayed execution wrapper function if any              
+		            	fileList[j].delayedExec && fileList[j]["delayedExec"](); 
+		            }
+		    	}
+		    	if (++count == len && callBack) {
+		    		callBack();
+		    	}
+		    };
+		
+	    for(;i < len; i++) {
+			file = fileList[i];
+			scriptObj = document.createElement("script"); // Creating script element
+			scriptObj.type = "text/javascript";
+			scriptObj.async = true;
+	        if (scriptObj.readyState) { // For IE
+	        	// Passing idx as closure to done function to know the order of the loaded JS
+	        	scriptObj.onreadystatechange = function (idx) {
+	        		return function () {
+	        			var state = this.readyState;
+	        			if (state == "loaded" || state == "complete" || state == "completed") {
+	        				this.onreadystatechange = null;
+	                            done(idx);
+	        			}
+	        		};
+	        	}(i);
+	        } else { // For all other browsers
+	        	// Passing idx as closure to done function to know the order of the loaded JS
+	        	scriptObj.onload = function (idx) {
+	        		return function () {
+	        			done(idx);
+	        		};
+	        	}(i);
+	        }
+	        scriptObj.src = file.url || file;
+	        headObj.appendChild(scriptObj);
+	    }
+	};
+
+	var wrappedFn; //Dummy declaration for the wrapper function
+	loadScript([{ url: "http://mail.yimg.com/zz/combo?nq/913/yui/yui-min.js&nq/913/oop/oop-min.js&nq/913/dom/dom-min.js&nq/913/event/event-min.js&nq/913/event-custom/event-custom-min.js&nq/913/base/base-base-min.js&nq/913/plugin/plugin-min.js&nq/913/pluginhost/pluginhost-min.js&nq/913/node/node-min.js&nq/913/attribute/attribute-min.js&nq/913/io/io-base-min.js&nq/913/io/io-xdr-min.js&nq/913/json/json-min.js&nq/913/intl/intl-min.js&nq/913/datatype/lang/datatype-date.js&nq/913/datatype/datatype-date-min.js&nq/913/datatype/datatype-xml-min.js&nq/913/cookie/cookie-min.js&nq/913/async-queue/async-queue-min.js&nq/913/collection/array-extras-min.js&nq/913/loader/loader-min.js", delayedExec: false }, 
+	    		{ url: "http://mail.yimg.com/zz/combo?nq/launch/common-neo-base_1499.js&nq/launch/common-neo-om_1499.js&nq/launch/inbox-om_1499.js&nq/launch/inbox-base_1499.js", delayedExec: wrappedFn }],
+	    		function(){
+   					var h1 = document.getElementById("head1"), content = h1.innerHTML;
+   					h1.innerHTML = content + "<br/>DONE loading scripts...";
+   				});
+	</script>
+</body>
+</html>
