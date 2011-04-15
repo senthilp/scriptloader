@@ -18,8 +18,8 @@ var wrappedFn = function () {
 };
 
 loadScript([
-	{ url:  “one.js”, delayedExec:  false }, 
-	{ url:  “two.js”, delayedExec:  “wrappedFn” }
+	{ url:  'one.js', delayedExec:  false }, 
+	{ url:  'two.js', delayedExec:  'wrappedFn' }
 ], function () {
 	// Callback function
 });
