@@ -17,8 +17,8 @@
  *
  * @function loadScript
  * @param fileList {Array|String} Array of JSON objects or the URL string
- * 					JSON object format { url:  “http://one.js”, delayedExec:  false },
- * 									   { url:  “http://two.js”, delayedExec:  “wrappedFn” }, 
+ * 					JSON object format { url:  'http://one.js', delayedExec:  false },
+ * 									   { url:  'http://two.js', delayedExec:  'wrappedFn' }, 
  * @param callback {function} the callback function to be executed after the scripts are
  * 							  loaded
  * 
