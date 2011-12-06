@@ -24,8 +24,8 @@
  * 
  */
 function loadScript(fileList, callBack) {
-    // Type conversion of fileList parameter if not an Array 
-	fileList = fileList.constructor === Array ? fileList : [fileList];
+    // Type conversion of fileList parameter if not an Array
+	fileList = (Array.isArray && Array.isArray(fileList)) || Object.prototype.toString.call(fileList) === "[object Array]" ? fileList : [fileList];
     
 	var count = 0, 
     	i = 0, 
