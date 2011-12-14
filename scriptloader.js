@@ -33,7 +33,7 @@ function loadScript(fileList, callBack) {
     	obj = (typeof fileList[i] === "object"), 
     	scriptObj, 
     	headObj = document.documentElement.firstChild,
-    	
+    	file,
     	done = function (idx) {
 	    	if (obj) {
 	    		fileList[idx].done = true;
