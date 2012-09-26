@@ -1,4 +1,7 @@
 /**
+ * Copyright 2012, Senthil Padmanabhan
+ * Released under the MIT License
+ * http://www.opensource.org/licenses/MIT
  * 
  * ScriptLoader is a simple JavaScript loader utility API which downloads scripts 
  * in parallel with other resources along with maintaining execution order. 
