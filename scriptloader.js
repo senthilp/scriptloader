@@ -72,7 +72,7 @@ function loadScript(fileList, callBack) {
         	}(i);
         } else { // For all other browsers
         	// Passing idx as closure to done function to know the order of the loaded JS
-        	scriptObj.onload = function (idx) {
+        	scriptObj.onload = scriptObj.onerror = function (idx) {
         		return function () {
         			done(idx);
         		};
